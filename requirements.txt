@@ -1,0 +1,24 @@
+# requirements.txt — Python dependencies untuk bili-app Tauri backend
+# Install: pip install -r requirements.txt
+
+# ML framework
+# The checked-in `.keras` models were saved with Keras 3.10.0.
+# TensorFlow 2.20 depends on Keras >=3.10 and is closer to those artifacts than
+# TensorFlow 2.21, which pulls Keras >=3.12.
+# Install this in a clean venv. Do not layer it over TensorFlow 2.14, because
+# `tensorflow-intel 2.14.x` requires incompatible keras/ml-dtypes/numpy/protobuf.
+tensorflow==2.20.0
+flatbuffers>=24.3.25
+
+# Image processing
+opencv-python>=4.10.0
+Pillow>=10.1.0
+
+# Data
+numpy>=1.26.0,<2.2
+pandas>=2.2.0
+scipy>=1.13.0
+
+# API server
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0

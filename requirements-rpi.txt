@@ -1,0 +1,24 @@
+# Raspberry Pi 5 / Ubuntu ARM64 runtime dependencies.
+# Use Python 3.10 or 3.11. The official tflite-runtime 2.14 wheels support
+# cp38-cp311 on aarch64, and are not built for Python 3.12+.
+# Prefer installing OpenCV/libcamera system packages with apt, then install this file in .venv-lin.
+
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+# tflite-runtime wheels are compiled against the NumPy 1.x C API.
+# NumPy 2.x can fail at interpreter creation with: AttributeError: _ARRAY_API not found.
+numpy>=1.26.0,<2.0
+pandas>=2.2.0,<2.3.0
+scipy>=1.13.0,<1.14.0
+Pillow>=10.1.0
+
+# Use TensorFlow Lite on Raspberry Pi instead of full TensorFlow.
+# Keep this pinned. Newer TFLite models can require newer op versions, but
+# tflite-runtime's latest public wheel is 2.14.0; changing this to >= will not
+# make a newer compatible wheel appear.
+tflite-runtime==2.14.0; platform_machine == "aarch64" and python_version < "3.12"
+
+# Install with apt on Pi when possible:
+#   sudo apt install -y python3-opencv libopencv-dev rpicam-apps libcamera-apps
+# If apt OpenCV is unavailable in your venv, uncomment this fallback.
+# opencv-python-headless>=4.10.0

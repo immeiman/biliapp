@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=BiliApp
+Exec=/home/bilirubin/BiliApp/biliapp/launch-gui.sh
+Hidden=false
+X-GNOME-Autostart-enabled=true
+StartupNotify=false

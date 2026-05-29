@@ -1,0 +1,10 @@
+# Lightweight QA/test dependencies.
+# This avoids installing full TensorFlow when the goal is to test camera,
+# preprocessing, logging, and API-adjacent flow.
+
+pytest>=8.0
+numpy>=1.26.0,<2.0
+pandas>=2.2.0,<2.3.0
+opencv-python-headless>=4.10.0,<4.13.0
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0

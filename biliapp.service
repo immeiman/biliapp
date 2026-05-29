@@ -1,0 +1,13 @@
+[Unit]
+Description=BiliApp GPIO Setup — nonaktifkan SPI untuk akses BCM 7 & 8
+DefaultDependencies=no
+After=sysinit.target
+Before=graphical.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '/sbin/modprobe -r spidev 2>/dev/null; /sbin/modprobe -r spi_bcm2835 2>/dev/null; exit 0'
+
+[Install]
+WantedBy=sysinit.target

@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>Sistem Deteksi Bilirubin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  SPLASH — connecting                                                   -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-splash" class="screen active">
+  <div class="splash-center">
+    <div class="splash-logo">🩺</div>
+    <div class="splash-title">Sistem Deteksi Bilirubin</div>
+    <div class="splash-sub">Neonatal Jaundice Detection</div>
+    <div class="splash-spinner"></div>
+    <div id="splash-status" class="splash-status">Menghubungkan ke server…</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  HOME                                                                 -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-home" class="screen">
+  <div class="home-body">
+    <div class="camera-wrap focus-idle" id="camera-wrap">
+      <img id="cam-img" class="cam-img" alt="Camera" />
+      <div id="cam-placeholder" class="cam-placeholder">
+        <div class="cam-icon">&#128247;</div>
+        <div>Memuat kamera...</div>
+        <div class="cam-hint">Hubungkan kamera dan restart</div>
+      </div>
+      <div class="camera-corners" aria-hidden="true">
+        <span class="cam-corner corner-tl"></span>
+        <span class="cam-corner corner-tr"></span>
+        <span class="cam-corner corner-bl"></span>
+        <span class="cam-corner corner-br"></span>
+      </div>
+      <div id="focus-reticle" class="focus-reticle focus-idle" aria-hidden="true">
+        <span class="focus-line focus-line-h"></span>
+        <span class="focus-line focus-line-v"></span>
+      </div>
+      <div id="camera-status" class="camera-status"></div>
+    </div>
+
+    <div class="home-top-bar">
+      <button id="baby-select-btn" class="baby-chip" onclick="App.goBabies()">
+        <span class="baby-chip-label">Bayi</span>
+        <span id="active-baby-name">Pilih profil bayi</span>
+      </button>
+      <button id="sync-chip" class="sync-chip" onclick="App.runSync()">Offline</button>
+    </div>
+
+    <div class="camera-controls">
+      <button class="thumb-button" id="last-thumb" onclick="App.goLastImage()" aria-label="Lihat foto terakhir">
+        <img id="last-thumb-img" class="thumb-img" alt="" />
+        <span id="last-thumb-empty" class="thumb-empty"></span>
+      </button>
+      <button class="capture-round" id="btn-capture" onclick="App.startCapture()" aria-label="Capture">
+        <span class="capture-icon">&#128247;</span>
+      </button>
+      <button class="settings-round" onclick="App.goSettings()" aria-label="Settings">
+        <span class="settings-icon">&#9881;</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  CAPTURE / HASIL PREDIKSI                                             -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-capture" class="screen">
+  <div class="header">
+    <div class="header-title">HASIL PREDIKSI</div>
+    <div class="header-sub">Analisis Kadar Bilirubin</div>
+  </div>
+  <div class="content" id="capture-content">
+    <!-- filled by JS -->
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goHome()">❮ Kembali</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  MENU UTAMA                                                           -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-menu" class="screen">
+  <div class="header">
+    <div class="header-title">MENU UTAMA</div>
+    <div class="header-sub">Navigasi dan Pengaturan Sistem</div>
+  </div>
+  <div class="content">
+    <div class="menu-card" onclick="App.goBabies()">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-title">Profil Bayi</div>
+        <div class="menu-card-sub">Pilih profil bayi dan sinkronisasi cache</div>
+      </div>
+      <div class="menu-card-arrow">â¯</div>
+    </div>
+    <div class="menu-card" onclick="App.goHistory()">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-title">Riwayat Prediksi</div>
+        <div class="menu-card-sub">Lihat 10 hasil prediksi terakhir</div>
+      </div>
+      <div class="menu-card-arrow">❯</div>
+    </div>
+    <div class="menu-card" onclick="App.goLastImage()">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-title">Lihat Foto Terakhir</div>
+        <div class="menu-card-sub">Tampilkan gambar yang baru diambil</div>
+      </div>
+      <div class="menu-card-arrow">❯</div>
+    </div>
+    <div class="menu-card" onclick="App.goSysInfo()">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-title">Info Sistem</div>
+        <div class="menu-card-sub">Status kamera, model, dan penyimpanan</div>
+      </div>
+      <div class="menu-card-arrow">❯</div>
+    </div>
+    <div class="menu-card" onclick="App.goSettings()">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-title">Pengaturan</div>
+        <div class="menu-card-sub">Konfigurasi dan pemeliharaan sistem</div>
+      </div>
+      <div class="menu-card-arrow">❯</div>
+    </div>
+    <div class="divider" style="margin-top:16px"></div>
+    <button class="btn btn-danger" style="width:100%; margin-top:8px" onclick="App.exitApp()">
+      Keluar dari Aplikasi
+    </button>
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goHome()">❮ Kembali</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-babies" class="screen">
+  <div class="header">
+    <div class="header-title">PROFIL BAYI</div>
+    <div class="header-sub">Profil dari Supabase, tersimpan sebagai cache lokal</div>
+  </div>
+  <div class="content" id="babies-content">
+    <!-- filled by JS -->
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goMenu()">â® Kembali</button>
+  </div>
+</div>
+
+<!--  RIWAYAT PREDIKSI                                                     -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-history" class="screen">
+  <div class="header">
+    <div class="header-title">RIWAYAT PREDIKSI</div>
+    <div class="header-sub">10 Pemeriksaan Terakhir</div>
+  </div>
+  <div id="history-filter" class="status-strip" style="margin:10px 14px 0"></div>
+  <div id="history-stats" class="stats-bar" style="margin:10px 14px 0"></div>
+  <div class="content" style="padding-top:8px">
+    <div class="card" style="padding:10px 12px">
+      <div id="history-table" class="history-table"></div>
+    </div>
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goMenu()">❮ Kembali</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  FOTO TERAKHIR                                                        -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-image" class="screen">
+  <div class="header">
+    <div class="header-title">FOTO TERAKHIR</div>
+    <div class="header-sub">Tangkapan Gambar Sistem</div>
+  </div>
+  <div class="content" id="image-content">
+    <!-- filled by JS -->
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goMenu()">❮ Kembali</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  INFO SISTEM                                                          -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-sysinfo" class="screen">
+  <div class="header">
+    <div class="header-title">INFO SISTEM</div>
+    <div class="header-sub">Diagnostik Hardware &amp; Software</div>
+  </div>
+  <div class="content" id="sysinfo-content">
+    <!-- filled by JS -->
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goMenu()">❮ Kembali</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  PENGATURAN                                                           -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-settings" class="screen">
+  <div class="header">
+    <div class="header-title">PENGATURAN</div>
+    <div class="header-sub">Konfigurasi Sistem</div>
+  </div>
+  <div class="content">
+    <div class="menu-card" onclick="App.goNetworkSettings()">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-title">Pengaturan Jaringan</div>
+        <div class="menu-card-sub">Hotspot, WiFi Client, dan status koneksi</div>
+      </div>
+      <div class="menu-card-arrow">❯</div>
+    </div>
+    <div class="menu-card" onclick="App.goCameraConfig()">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-title">Konfigurasi Kamera</div>
+        <div class="menu-card-sub">Resolusi, brightness, tipe kamera</div>
+      </div>
+      <div class="menu-card-arrow">❯</div>
+    </div>
+    <div class="menu-card" onclick="App.goModelSelect()">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-title">Pilih Model</div>
+        <div class="menu-card-sub">Model default dari folder models</div>
+      </div>
+      <div class="menu-card-arrow">❯</div>
+    </div>
+    <div class="menu-card" onclick="App.goLoggingPrefs()">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-title">Preferensi Logging</div>
+        <div class="menu-card-sub">Lokasi log dan informasi penyimpanan</div>
+      </div>
+      <div class="menu-card-arrow">❯</div>
+    </div>
+    <div class="divider" style="margin-top:16px"></div>
+    <button class="btn btn-soft" style="width:100%; margin-top:8px; text-align:left; padding-left:16px"
+            onclick="App.cleanupImages()">
+      🗑 Bersihkan Gambar Lama (&gt; 7 hari)
+    </button>
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goMenu()">❮ Kembali</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  PENGATURAN JARINGAN                                                 -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-network" class="screen">
+  <div class="header">
+    <div class="header-title">PENGATURAN JARINGAN</div>
+    <div class="header-sub">Hotspot Lokal dan WiFi Client</div>
+  </div>
+  <div class="content" id="network-content">
+    <!-- filled by JS -->
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goSettings()">❮ Kembali</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  KONFIGURASI KAMERA                                                   -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-camera-config" class="screen">
+  <div class="header">
+    <div class="header-title">KONFIGURASI KAMERA</div>
+    <div class="header-sub">Pengaturan Kamera</div>
+  </div>
+  <div class="content" id="camera-config-content">
+    <!-- filled by JS -->
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goSettings()">❮ Kembali</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  PILIH MODEL                                                          -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-model" class="screen">
+  <div class="header">
+    <div class="header-title">PILIH MODEL</div>
+    <div class="header-sub">Konfigurasi Inferensi</div>
+  </div>
+  <div class="content">
+    <div class="info-panel" style="margin-bottom:12px">
+      Pilih model regresi yang akan dipakai sebagai default inferensi.
+    </div>
+    <div id="model-list"></div>
+    <div class="divider" style="margin-top:16px"></div>
+    <button class="btn btn-primary" style="width:100%; margin-top:8px" onclick="App.applyModelSettings()">
+      Terapkan
+    </button>
+    <div id="model-msg" style="text-align:center; font-size:13px; color:var(--ok); margin-top:8px; min-height:20px"></div>
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goSettings()">❮ Kembali</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!--  PREFERENSI LOGGING                                                   -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-logging" class="screen">
+  <div class="header">
+    <div class="header-title">PREFERENSI LOGGING</div>
+    <div class="header-sub">Informasi Log</div>
+  </div>
+  <div class="content" id="logging-content">
+    <!-- filled by JS -->
+  </div>
+  <div class="back-bar">
+    <button class="btn-back" onclick="App.goSettings()">❮ Kembali</button>
+  </div>
+</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
