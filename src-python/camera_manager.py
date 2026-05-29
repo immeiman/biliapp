@@ -33,6 +33,7 @@ from config import (
     CAMERA_CAPTURE_AWB_GAINS,
     CAMERA_CAPTURE_GAIN,
     CAMERA_CAPTURE_IMMEDIATE,
+    CAMERA_CAPTURE_LENS_POSITION,
     CAMERA_CAPTURE_SHUTTER_US,
     CAMERA_CAPTURE_TIMEOUT_MS,
 )
@@ -476,6 +477,7 @@ class CameraManager:
         capture_af_speed: str = CAMERA_CAPTURE_AF_SPEED,
         capture_af_on_capture: bool = CAMERA_CAPTURE_AF_ON_CAPTURE,
         capture_immediate: bool = CAMERA_CAPTURE_IMMEDIATE,
+        capture_lens_position: float = CAMERA_CAPTURE_LENS_POSITION,
     ):
         """
         Initialize camera.
@@ -506,6 +508,7 @@ class CameraManager:
         self.capture_af_speed = (capture_af_speed or "").strip().lower()
         self.capture_af_on_capture = bool(capture_af_on_capture)
         self.capture_immediate = bool(capture_immediate)
+        self.capture_lens_position = max(0.0, float(capture_lens_position))
 
         self.cap = None
         self._rpicam_cmd = None
@@ -635,9 +638,11 @@ class CameraManager:
             "--encoding", "jpg",
             "-o", "-",
         ]
-
+        
         if include_autofocus and self.capture_af_mode:
             cmd += ["--autofocus-mode", self.capture_af_mode]
+        if include_autofocus and self.capture_af_mode == "manual" and self.capture_lens_position > 0:
+            cmd += ["--lens-position", f"{self.capture_lens_position:.3f}"]
         if include_autofocus and self.capture_af_on_capture:
             cmd += ["--autofocus-on-capture"]
         if include_autofocus and self.capture_af_range:
@@ -898,6 +903,7 @@ class CameraManager:
                 "capture_af_speed": self.capture_af_speed,
                 "capture_af_on_capture": self.capture_af_on_capture,
                 "capture_immediate": self.capture_immediate,
+                "capture_lens_position": self.capture_lens_position,
                 "capture_command": self._rpicam_cmd,
                 "error": None
             }
