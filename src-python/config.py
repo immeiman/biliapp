@@ -65,13 +65,13 @@ def _load_dotenv(path: Path = DOTENV_PATH) -> bool:
         key = key.strip()
         if not _is_valid_env_key(key):
             continue
-        os.environ.setdefault(key, _normalize_env_value(value))
+        # os.environ.setdefault(key, _normalize_env_value(value))
+        os.environ[key] = _normalize_env_value(value)
 
     return True
 
-
 _DOTENV_LOADED = _load_dotenv()
-
+print(f"[Debug] Membuka .env dari: {DOTENV_PATH.resolve()}")
 
 def _is_raspberry_pi_hardware() -> bool:
     """Detect Raspberry Pi via /proc/device-tree/model or /proc/cpuinfo (no env var needed)."""
@@ -338,7 +338,7 @@ CAMERA_CAPTURE_RETRIES = _env_int("BILIRUBIN_CAPTURE_RETRIES", 2 if IS_RASPBERRY
 CAMERA_CAPTURE_RETRY_DELAY_MS = _env_int("BILIRUBIN_CAPTURE_RETRY_DELAY_MS", 250)
 CAMERA_SAVE_FAILED_CAPTURES = _env_bool("BILIRUBIN_SAVE_FAILED_CAPTURES", True)
 PREVIEW_POLL_MS = _env_int("BILIRUBIN_PREVIEW_POLL_MS", 33)  # 33ms ≈ 30fps pada semua platform
-CAMERA_CAPTURE_LENS_POSITION = _env_float("BILIRUBIN_CAPTURE_LENS_POSITION", 6.667)
+CAMERA_CAPTURE_LENS_POSITION = _env_float("BILIRUBIN_CAPTURE_LENS_POSITION", 15)
 PREVIEW_JPEG_QUALITY = _env_int("BILIRUBIN_PREVIEW_JPEG_QUALITY", 65 if IS_RASPBERRY_PI else 70)
 PREVIEW_FPS = _env_int("BILIRUBIN_PREVIEW_FPS", 0)       # 0 = auto-detect from camera
 PREVIEW_MIN_FPS = _env_int("BILIRUBIN_PREVIEW_MIN_FPS", 5)  # lenient; real check via detected FPS
